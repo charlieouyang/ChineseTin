@@ -112,8 +112,8 @@
 
 			// Create layer object    
 			var layer = new Kinetic.Layer();
-			layer.add(disc1);
 			layer.add(disc2);
+			layer.add(disc1);
 			stage.add(layer);
 
 			var factor = 500,
@@ -155,7 +155,7 @@
 
 			setTimeout( function () {
 				anim.start();
-			}, 1000);
+			}, 1500);
 		};
 
 
