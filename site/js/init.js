@@ -56,56 +56,107 @@
 	$(function() {
 		
 
+		//Define images . Do not include folder only image names
+		var sources = {
+			disc1: 'square.png',
+			disc2: 'square2.png'
+		};
+		//Load above images
+		loadImages(sources, initStage);
 
+		//load array of images on page load    
+		function loadImages(sources, callback) {
+			var assetDir = 'images/';
+			var images = {};
+			var loadedImages = 0;
+			var numImages = 0;
 
-		//Drawing function right here
-		var sun = new Image();
-		var moon = new Image();
-		var earth = new Image();
-
-		init();
-		function init(){
-		  sun.src = 'https://mdn.mozillademos.org/files/1456/Canvas_sun.png';
-		  moon.src = 'https://mdn.mozillademos.org/files/1443/Canvas_moon.png';
-		  earth.src = 'https://mdn.mozillademos.org/files/1429/Canvas_earth.png';
-		  setInterval(draw,100);
+			// Load all images from folder in loop
+			for (var src in sources) {
+				numImages++;
+			}
+			for (var src in sources) {
+				images[src] = new Image();
+				images[src].onload = function() {
+					if (++loadedImages >= numImages) {
+						callback(images);
+					}
+				};
+				images[src].src = assetDir + sources[src];
+			}
 		}
 
-		function draw() {
-		  var ctx = document.getElementById('animation-canvas').getContext('2d');
+		// Create stage   
+		function initStage(images) {
+			var stage = new Kinetic.Stage({
+				container: 'discarea',
+				width: 1000,
+				height: 500
+			});
 
-		  ctx.globalCompositeOperation = 'destination-over';
-		  ctx.clearRect(0,0,300,300); // clear canvas
+			// Define properties of the Disc
+			var disc1 = new Kinetic.Image({
+				image: images.disc1,
+				x: 0, //horizontal axis of disc1
+				y: 0, //vertical axis of disc1
+				width: 400,
+				height: 400
+			});
+			var disc2 = new Kinetic.Image({
+				image: images.disc2,
+				x: 0, //horizontal axis of disc2
+				y: 0, //vertical axis of disc2
+				width: 400,
+				height: 400
+			});
 
-		  ctx.fillStyle = 'rgba(0,0,0,0.4)';
-		  ctx.strokeStyle = 'rgba(0,153,255,0.4)';
-		  ctx.save();
-		  ctx.translate(150,150);
+			// Create layer object    
+			var layer = new Kinetic.Layer();
+			layer.add(disc1);
+			layer.add(disc2);
+			stage.add(layer);
 
-		  // Earth
-		  var time = new Date();
-		  ctx.rotate( ((2*Math.PI)/60)*time.getSeconds() + ((2*Math.PI)/60000)*time.getMilliseconds() );
-		  ctx.translate(105,0);
-		  ctx.fillRect(0,-12,50,24); // Shadow
-		  ctx.drawImage(earth,-12,-12);
+			var factor = 500,
+				timeFactor = 750,
+				yFactor = 1100,
+				opacityFactor = 100,
+				xFactor = 300,
+				centerX = 50,
+				currentShape = 1,
+				previousShape;
 
-		  // Moon
-		  ctx.save();
-		  ctx.rotate( ((2*Math.PI)/6)*time.getSeconds() + ((2*Math.PI)/6000)*time.getMilliseconds() );
-		  ctx.translate(0,28.5);
-		  ctx.drawImage(moon,-3.5,-3.5);
-		  ctx.restore();
+			var anim = new Kinetic.Animation(function(frame) {
+				if (currentShape == 1) {
+					disc1.setX(xFactor * Math.sin(frame.time / factor) + centerX);
+					disc1.setY(Math.sin(frame.time / yFactor) * factor);
+					disc1.setOpacity(opacityFactor / frame.time);
+					if (frame.time > timeFactor) {
+						disc1.destroy();
+						previousShape = currentShape;
+						currentShape = 99;
+					}
+				} else if (currentShape == 2) {
+					disc2.setX(xFactor * Math.sin(frame.time / factor) + centerX);
+					disc2.setY(Math.sin(frame.time / yFactor) * factor);
+					disc2.setOpacity(opacityFactor / frame.time);
+					if (frame.time > timeFactor) {
+						disc2.destroy();
+						previousShape = currentShape;
+						currentShape = 99;
+					}
+				} else {
+					if (frame.time > timeFactor * 2) {
+						frame.time = 0;
+						currentShape = previousShape + 1;
+					}
+				}
+				
+			}, layer);
 
-		  ctx.restore();
-		  
-		  ctx.beginPath();
-		  ctx.arc(150,150,105,0,Math.PI*2,false); // Earth orbit
-		  ctx.stroke();
-		 
-		  ctx.drawImage(sun,0,0,300,300);
-		}
-
-
+			setTimeout( function () {
+				anim.start();
+			}, 1000);
+		};
 
 
 
