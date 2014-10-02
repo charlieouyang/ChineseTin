@@ -976,6 +976,10 @@
 		padding-top: 3em;
 	}
 
+	.header-button {
+		box-shadow: none !important;
+	}
+
 	body.landing #skel-layers-wrapper {
 		padding-top: 0;
 	}
@@ -1222,7 +1226,7 @@
 	#banner {
 		background-attachment: scroll,							fixed;
 		background-color: #666;
-		background-image: url("images/overlay.png"), url("../images/121.jpg");
+		background-image: url("images/overlay.png"), url("../images/hk2.png");
 		background-position: top left,						center center;
 		background-repeat: repeat,							no-repeat;
 		background-size: auto,							cover;
